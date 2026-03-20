@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Vitae - Plataforma de Cursos</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+<style>
+* {margin:0; padding:0; box-sizing:border-box;}
+body {
+  font-family: 'Poppins', sans-serif;
+  background:#0b0f1a;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  min-height:100vh;
+  padding:40px 0;
+  overflow-x:hidden;
+}
+
+/* Fundo animado */
+.fundo-animado {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  pointer-events:none; overflow:hidden; z-index:0;
+}
+.fundo-animado span {
+  position:absolute; font-size:34px; opacity:0.4;
+  filter: drop-shadow(0 0 6px #6fd3ff);
+  animation: subir linear infinite;
+}
+.fundo-animado span:nth-child(1){left:5%; animation-duration:12s;}
+.fundo-animado span:nth-child(2){left:20%; animation-duration:14s;}
+.fundo-animado span:nth-child(3){left:35%; animation-duration:10s;}
+.fundo-animado span:nth-child(4){left:50%; animation-duration:13s;}
+.fundo-animado span:nth-child(5){left:65%; animation-duration:15s;}
+.fundo-animado span:nth-child(6){left:80%; animation-duration:11s;}
+@keyframes subir {0%{top:110%; transform:translateX(0) rotate(0deg);}100%{top:-10%; transform:translateX(60px) rotate(360deg);}}
+
+/* Cursos com cores pastéis */
+.cursos {position:relative; z-index:2; width:100%; max-width:1200px; padding:20px;
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:25px;}
+.curso {
+  height:200px; border-radius:15px; display:flex; justify-content:center; align-items:center;
+  font-size:1.2rem; font-weight:700; text-transform:uppercase; cursor:pointer; color:#000;
+  box-shadow:0 0 10px rgba(100,200,255,0.3),
+             0 0 25px rgba(100,200,255,0.2),
+             0 0 40px rgba(100,200,255,0.15);
+  transition:0.3s;
+}
+.curso:hover {transform:translateY(-8px) scale(1.02);
+  box-shadow:0 0 15px rgba(120,220,255,0.6),
+             0 0 35px rgba(120,220,255,0.4);}
+.c1 {background-color:#d0f0f7;} .c2 {background-color:#e4d7ff;} .c3 {background-color:#d7ffd9;}
+.c4 {background-color:#ffe4f1;} .c5 {background-color:#fff4cc;} .c6 {background-color:#d9f7ff;}
+.c7 {background-color:#fce1d4;} .c8 {background-color:#e8ffd9;}
+
+/* Galeria */
+#galeria {
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.95); display:none; flex-direction:column;
+  justify-content:flex-start; align-items:center; padding-top:60px;
+  overflow-y:auto; z-index:1000;
+}
+#tituloGaleria {
+  color:#7dd3fc; font-size:28px; font-weight:bold; margin-bottom:20px;
+  text-shadow:0 0 10px #38bdf8;
+}
+#fechar {position:absolute; top:20px; right:20px; color:white; font-size:36px; cursor:pointer;}
+#imagens img {
+  width:280px; margin:10px; border-radius:10px;
+  box-shadow:0 0 15px rgba(100,200,255,0.4);
+}
+
+/* Chat */
+#chatbot {position:fixed; bottom:20px; right:20px; background:#007bff; color:white; border-radius:50%;
+  width:60px; height:60px; display:flex; justify-content:center; alignments:center; cursor:pointer; font-size:26px;}
+#chatWrapper {position:fixed; bottom:90px; right:20px; width:350px; height:500px; background:#0f172a; border-radius:15px; display:none; flex-direction:column;}
+.mensagens {flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:12px;}
+.mensagem {padding:12px 18px; border-radius:20px; max-width:75%; font-size:14px;}
+.usuario {background:#2563eb;color:white; align-self:flex-end;}
+.bot {background:#1e293b;color:#e2e8f0; align-self:flex-start;}
+</style>
+</head>
+<body>
+
+<div class="fundo-animado">
+  <span>🩺</span><span>💊</span><span>💉</span><span>🧸</span><span>🩹</span><span>🧪</span>
+</div>
+
+<div class="cursos">
+  <div class="curso c1" onclick="abrirGaleria('Enfermagem')">Enfermagem</div>
+  <div class="curso c2" onclick="abrirGaleria('Radiologia')">Radiologia</div>
+  <div class="curso c3" onclick="abrirGaleria('Farmácia')">Farmácia</div>
+  <div class="curso c4" onclick="abrirGaleria('Estética')">Estética</div>
+  <div class="curso c5" onclick="abrirGaleria('Biomedicina')">Biomedicina</div>
+  <div class="curso c6" onclick="abrirGaleria('Pediatria')">Pediatria</div>
+  <div class="curso c7" onclick="abrirGaleria('Nutrição')">Nutrição</div>
+  <div class="curso c8" onclick="abrirGaleria('Odontologia')">Odontologia</div>
+</div>
+
+<div id="galeria">
+  <div id="fechar" onclick="fecharGaleria()">✖</div>
+  <div id="tituloGaleria"></div>
+  <div id="imagens"></div>
+</div>
+
+<script>
+// Galeria com imagens de saúde reais (consultórios, hospitais e profissionais)
+const fotosCurso = {
+ 
+  "Enfermagem": [
+    "https://images.pexels.com/photos/5328335/pexels-photo-5328335.jpeg",
+    "https://images.pexels.com/photos/2735099/pexels-photo-2735099.jpeg",
+    "https://images.pexels.com/photos/3903943/pexels-photo-3903943.jpeg"
+  ],
+  "Radiologia": [
+    "https://images.pexels.com/photos/3903943/pexels-photo-3903943.jpeg",
+    "https://images.pexels.com/photos/4843709/pexels-photo-4843709.jpeg",
+    "https://images.pexels.com/photos/9270220/pexels-photo-9270220.jpeg"
+  ],
+  "Farmácia": [
+    "https://images.pexels.com/photos/1779029/pexels-photo-1779029.jpeg",
+    "https://images.pexels.com/photos/40568/pexels-photo-40568.jpeg",
+    "https://images.pexels.com/photos/3774549/pexels-photo-3774549.jpeg"
+  ],
+  "Estética": [
+    "https://images.pexels.com/photos/4320597/pexels-photo-4320597.jpeg",
+    "https://images.pexels.com/photos/5077049/pexels-photo-5077049.jpeg",
+    "https://images.pexels.com/photos/4320599/pexels-photo-4320599.jpeg"
+  ],
+  "Biomedicina": [
+    "https://images.pexels.com/photos/3845755/pexels-photo-3845755.jpeg",
+    "https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg",
+    "https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg"
+  ],
+  "Pediatria": [
+  "https://images.pexels.com/photos/5998441/pexels-photo-5998441.jpeg",
+  "https://images.pexels.com/photos/5998450/pexels-photo-5998450.jpeg",
+  "https://images.pexels.com/photos/7447010/pexels-photo-7447010.jpeg"
+  ],
+  "Nutrição": [
+    "https://images.pexels.com/photos/4195585/pexels-photo-4195585.jpeg",
+    "https://images.pexels.com/photos/8530996/pexels-photo-8530996.jpeg",
+    "https://images.pexels.com/photos/8530997/pexels-photo-8530997.jpeg"
+  ],
+  "Odontologia": [
+    "https://images.pexels.com/photos/34007068/pexels-photo-34007068.jpeg",
+    "https://images.pexels.com/photos/4687907/pexels-photo-4687907.jpeg",
+    "https://images.pexels.com/photos/5359665/pexels-photo-5359665.jpeg"
+  ]
+};
+
+function abrirGaleria(curso) {
+  const gal = document.getElementById("galeria");
+  const imagensDiv = document.getElementById("imagens");
+  const titulo = document.getElementById("tituloGaleria");
+  imagensDiv.innerHTML = "";
+  titulo.innerText = curso;
+  (fotosCurso[curso] || []).forEach(src => {
+    const img = document.createElement("img");
+    img.src = src + "?auto=compress&cs=tinysrgb&w=600";
+    imagensDiv.appendChild(img);
+  });
+  gal.style.display = "flex";
+}
+
+function fecharGaleria() {
+  document.getElementById("galeria").style.display = "none";
+}
+</script>
+
+</body>
+</html>
